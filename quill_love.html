@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다섯 번의 편지와 하나의 답장</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810, #4a3428);
+            color: #f4f1e8;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #d4af37;
+        }
+
+        .game-title {
+            font-size: 2.5em;
+            color: #d4af37;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .game-subtitle {
+            font-size: 1.2em;
+            color: #c9b037;
+            font-style: italic;
+        }
+
+        /* 캐릭터 메이킹 */
+        .character-creation {
+            background: rgba(0,0,0,0.4);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 10px;
+        }
+
+        .character-form {
+            display: grid;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .form-label {
+            font-weight: bold;
+            color: #d4af37;
+            min-width: 80px;
+        }
+
+        .form-input, .form-select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            padding: 8px 12px;
+            color: #f4f1e8;
+            min-width: 150px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #f4f1e8;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .abilities-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .ability-item {
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .ability-name {
+            font-weight: bold;
+            color: #d4af37;
+            font-size: 0.9em;
+        }
+
+        .ability-value {
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+
+        .ability-good { color: #4CAF50; }
+        .ability-normal { color: #FFC107; }
+        .ability-bad { color: #F44336; }
+
+        /* 편지 작성 화면 */
+        .letter-interface {
+            display: none;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .letter-sidebar {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .letter-main {
+            background: rgba(0,0,0,0.4);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .letter-number {
+            font-size: 1.8em;
+            color: #d4af37;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .judgement-section {
+            margin-bottom: 25px;
+        }
+
+        .judgement-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .judgement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 3px;
+        }
+
+        .judgement-label {
+            font-size: 0.9em;
+            color: #c9b037;
+        }
+
+        .judgement-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #d4af37;
+        }
+
+        .dice-section {
+            background: rgba(212, 175, 55, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .dice-info {
+            font-size: 0.9em;
+            color: #c9b037;
+            margin-bottom: 8px;
+        }
+
+        .dice-btn {
+            background: linear-gradient(135deg, #d4af37, #c9b037);
+            color: #2c1810;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .dice-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .dice-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dice-result {
+            font-size: 0.8em;
+            color: #f4f1e8;
+            min-height: 20px;
+        }
+
+        .dice-success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .dice-failure {
+            color: #F44336;
+            font-weight: bold;
+        }
+
+        .word-bank {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .word-bank-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .word-pairs {
+            display: grid;
+            gap: 8px;
+        }
+
+        .word-pair {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .passive-word {
+            color: #888;
+            font-style: italic;
+        }
+
+        .active-word {
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .letter-prompt {
+            font-size: 1.1em;
+            color: #f4f1e8;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d4af37;
+        }
+
+        .letter-editor {
+            background: #f4f1e8;
+            color: #2c1810;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 350px;
+            font-family: 'Georgia', serif;
+            font-size: 1.1em;
+            line-height: 1.8;
+            border: none;
+            outline: none;
+            resize: vertical;
+            width: 100%;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .letter-editor::placeholder {
+            color: #666;
+            font-style: italic;
+        }
+
+        .score-display {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            display: block;
+            color: #c9b037;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            display: block;
+            color: #d4af37;
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #d4af37, #c9b037);
+            color: #2c1810;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .story-section {
+            background: rgba(0,0,0,0.5);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #d4af37;
+            display: none;
+        }
+
+        .story-title {
+            color: #d4af37;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .story-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        @media (max-width: 1024px) {
+            .letter-interface {
+                grid-template-columns: 1fr;
+            }
+            
+            .letter-sidebar {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .game-title {
+                font-size: 2em;
+            }
+            
+            .abilities-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1 class="game-title">다섯 번의 편지와 하나의 답장</h1>
+            <p class="game-subtitle">익명의 후원자에게 보내는 사랑의 편지</p>
+        </div>
+
+        <!-- 시나리오 소개 -->
+        <div class="character-creation" id="scenarioIntro">
+            <h2 class="section-title">시나리오 소개</h2>
+            <div style="background: rgba(212, 175, 55, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <p style="margin-bottom: 15px;">긴 무명 생활에 지쳐가던 어느 날, 이름도 얼굴도 모르는 익명의 후원자로부터 후원금을 받게 된다.</p>
+                <p style="margin-bottom: 15px;">그는 한마디 말도 없이 자신의 사용인을 통해 후원금을 전달할 뿐, 그 어떤 신상 정보도 알려주지 않는다.</p>
+                <p>어느 날, 주인공은 문득 그에게 하고 싶은 말이 떠올라 펜을 들어 편지를 쓰기 시작한다.</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" onclick="showCharacterCreation()">캐릭터 만들기</button>
+            </div>
+        </div>
+
+        <!-- 캐릭터 메이킹 -->
+        <div class="character-creation" id="characterCreation" style="display: none;">
+            <h2 class="section-title">캐릭터 메이킹</h2>
+            <div class="character-form">
+                <div class="form-group">
+                    <label class="form-label">이름</label>
+                    <input type="text" class="form-input" id="characterName" placeholder="예술가의 이름을 입력하세요">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">직업</label>
+                    <select class="form-select" id="characterProfession" onchange="updateAbilities()">
+                        <option value="">선택하세요</option>
+                        <option value="writer">작가</option>
+                        <option value="painter">화가</option>
+                        <option value="musician">음악가</option>
+                    </select>
+                </div>
+
+                <div class="abilities-display">
+                    <div class="ability-item">
+                        <div class="ability-name">감정</div>
+                        <div class="ability-value" id="emotion">-</div>
+                    </div>
+                    <div class="ability-item">
+                        <div class="ability-name">문장력</div>
+                        <div class="ability-value" id="language">-</div>
+                    </div>
+                    <div class="ability-item">
+                        <div class="ability-name">필체</div>
+                        <div class="ability-value" id="penmanship">-</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">기술</label>
+                    <select class="form-select" id="characterSkill">
+                        <option value="">선택하세요</option>
+                        <option value="inspiration">영감 (문장력 판정에 주사위 +1)</option>
+                        <option value="elegance">화려함 (필체 판정에 주사위 +1)</option>
+                        <option value="passion">부푼 감정 (감정 판정에 주사위 +1)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" id="startGameBtn" onclick="startGame()" disabled>게임 시작</button>
+            </div>
+        </div>
+
+        <!-- 편지 작성 인터페이스 -->
+        <div class="letter-interface" id="letterInterface">
+            <!-- 좌측 사이드바 -->
+            <div class="letter-sidebar">
+                <div class="letter-number" id="letterNumber">첫 번째 편지</div>
+                
+                <!-- 주사위 판정 -->
+                <div class="judgement-section">
+                    <div class="judgement-title">🎲 감정 판정 (미사여구)</div>
+                    <div class="dice-section">
+                        <div class="dice-info">
+                            <span id="emotionDiceCount">2</span>개 주사위
+                        </div>
+                        <button class="dice-btn" id="emotionRollBtn" onclick="rollEmotion()">주사위 굴리기</button>
+                        <div class="dice-result" id="emotionResult"></div>
+                    </div>
+                </div>
+
+                <div class="judgement-section">
+                    <div class="judgement-title">🎲 문장력 판정</div>
+                    <div class="dice-section">
+                        <div class="dice-info">
+                            <span id="languageDiceCount">2</span>개 주사위
+                        </div>
+                        <button class="dice-btn" id="languageRollBtn" onclick="rollLanguage()">주사위 굴리기</button>
+                        <div class="dice-result" id="languageResult"></div>
+                    </div>
+                </div>
+
+                <div class="judgement-section">
+                    <div class="judgement-title">🎲 필체 판정</div>
+                    <div class="dice-section">
+                        <div class="dice-info">
+                            <span id="penmanshipDiceCount">2</span>개 주사위
+                        </div>
+                        <button class="dice-btn" id="penmanshipRollBtn" onclick="rollPenmanship()">주사위 굴리기</button>
+                        <div class="dice-result" id="penmanshipResult"></div>
+                    </div>
+                </div>
+
+                <div class="judgement-section">
+                    <div class="judgement-title">⚡ 기술 사용</div>
+                    <div class="judgement-row">
+                        <span class="judgement-label" id="skillLabel">미사용</span>
+                        <input type="checkbox" class="judgement-checkbox" id="skillCheck">
+                    </div>
+                    <div style="font-size: 0.7em; color: #888; margin-top: 5px; text-align: center;">
+                        기술 사용 시 해당 능력치에<br>주사위 +1개 추가
+                    </div>
+                </div>
+
+                <!-- 단어 은행 -->
+                <div class="word-bank">
+                    <div class="word-bank-title">💭 단어 은행</div>
+                    <div class="word-pairs" id="wordBank">
+                        <!-- 단어들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+
+                <!-- 점수 계산 안내 -->
+                <div class="word-bank">
+                    <div class="word-bank-title">📊 점수 계산법</div>
+                    <div style="font-size: 0.8em; color: #c9b037; line-height: 1.4;">
+                        <div style="margin-bottom: 8px;"><strong>감정+문장력:</strong></div>
+                        <div>• 둘 다 성공: +2점</div>
+                        <div>• 감정성공+문장실패: -1점</div>
+                        <div>• 감정실패+문장성공: +1점</div>
+                        <div>• 둘 다 실패: 0점</div>
+                        <div style="margin: 8px 0;"><strong>필체 성공: +1점</strong></div>
+                        <div style="font-size: 0.7em; color: #888;">감정 판정은 선택사항입니다.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측 메인 -->
+            <div class="letter-main">
+                <div class="letter-prompt" id="letterPrompt">
+                    익명의 후원자에게 첫 편지를 써보세요. 당신의 예술에 대한 후원에 감사를 표하며, 앞으로의 창작 계획을 이야기해보세요.
+                </div>
+
+                <textarea class="letter-editor" id="letterEditor" placeholder="친애하는 후원자님께,
+
+후원해주신 덕분에 제가 예술에 전념할 수 있게 되었습니다..."></textarea>
+
+                <div class="score-display">
+                    <div class="score-row">
+                        <div class="score-item">
+                            <span class="score-label">단어+감정</span>
+                            <span class="score-value" id="wordEmotionScore">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">필체</span>
+                            <span class="score-value" id="penmanshipScore">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">편지 점수</span>
+                            <span class="score-value" id="letterScore">0</span>
+                        </div>
+                    </div>
+                    <div class="score-row">
+                        <div class="score-item">
+                            <span class="score-label">총 점수</span>
+                            <span class="score-value" id="totalScore">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" id="calculateScoreBtn" onclick="calculateScore()">점수 계산</button>
+                    <button class="btn" id="nextStepBtn" onclick="nextStep()" disabled>다음 단계</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 스토리 섹션 -->
+        <div class="story-section" id="storySection">
+            <div class="story-title" id="storyTitle">첫 번째 만남</div>
+            <div class="story-content" id="storyContent">
+                <!-- 스토리 내용이 여기에 표시됩니다 -->
+            </div>
+            <div class="action-buttons">
+                <button class="btn" onclick="continueToNextLetter()">다음 편지 쓰기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            character: {
+                name: '',
+                profession: '',
+                abilities: {emotion: 0, language: 0, penmanship: 0},
+                skill: ''
+            },
+            currentLetter: 1,
+            totalScore: 0,
+            letterScores: [],
+            skillUsed: false,
+            currentRolls: {
+                emotion: null,
+                language: null,
+                penmanship: null
+            }
+        };
+
+        const professionData = {
+            writer: {emotion: 1, language: 3, penmanship: 2},    // 나쁨/좋음/보통
+            painter: {emotion: 2, language: 1, penmanship: 3},   // 보통/나쁨/좋음
+            musician: {emotion: 3, language: 2, penmanship: 1}   // 좋음/보통/나쁨
+        };
+
+        const letterPrompts = {
+            1: "익명의 후원자에게 첫 편지를 써보세요. 당신의 예술에 대한 후원에 감사를 표하며, 앞으로의 창작 계획을 이야기해보세요.",
+            2: "오늘 흥미로운 분을 만났습니다. 그분과의 만남을 후원자님께 이야기해보세요.",
+            3: "그분을 다시 만났습니다. 점점 깊어지는 감정을 후원자님께 털어놓아보세요.",
+            4: "그분을 사랑하게 되었습니다. 후원자님께 이 마음을 고백해보세요.",
+            5: "마지막 편지입니다. 지금까지의 마음을 정리하여 써보세요."
+        };
+
+        const wordBanks = {
+            1: [
+                {passive: "그림", active: "영혼을 담은 캔버스"},
+                {passive: "돈", active: "소중한 후원"},
+                {passive: "작업실", active: "창작의 성소"},
+                {passive: "붓", active: "마음을 그리는 붓"},
+                {passive: "감사", active: "깊은 감명"},
+                {passive: "미래", active: "찬란한 전망"}
+            ],
+            2: [
+                {passive: "사람", active: "신비로운 분"},
+                {passive: "만남", active: "운명적 조우"},
+                {passive: "대화", active: "마음 깊은 대화"},
+                {passive: "눈", active: "별빛 같은 눈동자"},
+                {passive: "웃음", active: "은은한 미소"},
+                {passive: "시간", active: "황홀한 시간"}
+            ],
+            3: [
+                {passive: "또", active: "다시금"},
+                {passive: "마음", active: "떨리는 가슴"},
+                {passive: "생각", active: "그리운 마음"},
+                {passive: "밤", active: "잠 못 드는 밤"},
+                {passive: "꿈", active: "달콤한 꿈"},
+                {passive: "기다림", active: "간절한 기다림"}
+            ],
+            4: [
+                {passive: "사랑", active: "깊은 사랑"},
+                {passive: "마음", active: "불타는 마음"},
+                {passive: "고백", active: "진심 어린 고백"},
+                {passive: "감정", active: "타오르는 감정"},
+                {passive: "원함", active: "간절한 바람"},
+                {passive: "함께", active: "영원히 함께"}
+            ],
+            5: [
+                {passive: "끝", active: "새로운 시작"},
+                {passive: "감사", active: "무한한 감사"},
+                {passive: "기억", active: "소중한 기억"},
+                {passive: "앞으로", active: "찬란한 미래"},
+                {passive: "마음", active: "변치 않는 마음"},
+                {passive: "편지", active: "마지막 편지"}
+            ]
+        };
+
+        function showCharacterCreation() {
+            document.getElementById('scenarioIntro').style.display = 'none';
+            document.getElementById('characterCreation').style.display = 'block';
+        }
+
+        function updateAbilities() {
+            const profession = document.getElementById('characterProfession').value;
+            if (!profession) return;
+
+            const abilities = professionData[profession];
+            const abilityNames = ['나쁨', '보통', '좋음'];
+            const abilityClasses = ['ability-bad', 'ability-normal', 'ability-good'];
+
+            document.getElementById('emotion').textContent = abilityNames[abilities.emotion - 1];
+            document.getElementById('emotion').className = abilityClasses[abilities.emotion - 1];
+
+            document.getElementById('language').textContent = abilityNames[abilities.language - 1];
+            document.getElementById('language').className = abilityClasses[abilities.language - 1];
+
+            document.getElementById('penmanship').textContent = abilityNames[abilities.penmanship - 1];
+            document.getElementById('penmanship').className = abilityClasses[abilities.penmanship - 1];
+
+            checkFormComplete();
+        }
+
+        function checkFormComplete() {
+            const name = document.getElementById('characterName').value.trim();
+            const profession = document.getElementById('characterProfession').value;
+            const skill = document.getElementById('characterSkill').value;
+
+            document.getElementById('startGameBtn').disabled = !(name && profession && skill);
+        }
+
+        document.getElementById('characterName').addEventListener('input', checkFormComplete);
+        document.getElementById('characterSkill').addEventListener('change', checkFormComplete);
+
+        function startGame() {
+            // 캐릭터 정보 저장
+            gameState.character.name = document.getElementById('characterName').value.trim();
+            gameState.character.profession = document.getElementById('characterProfession').value;
+            gameState.character.abilities = professionData[gameState.character.profession];
+            gameState.character.skill = document.getElementById('characterSkill').value;
+
+            // 화면 전환
+            document.getElementById('characterCreation').style.display = 'none';
+            document.getElementById('letterInterface').style.display = 'grid';
+
+            // 첫 번째 편지 로드
+            loadLetter(1);
+        }
+
+        function loadLetter(letterNum) {
+            gameState.currentLetter = letterNum;
+            
+            const letterNumbers = ['', '첫 번째', '두 번째', '세 번째', '네 번째', '다섯 번째'];
+            document.getElementById('letterNumber').textContent = letterNumbers[letterNum] + ' 편지';
+            document.getElementById('letterPrompt').textContent = letterPrompts[letterNum];
+            
+            // 편지 에디터 초기화
+            document.getElementById('letterEditor').value = '';
+            
+            // 주사위 굴리기 결과 초기화
+            gameState.currentRolls = {emotion: null, language: null, penmanship: null};
+            document.getElementById('emotionResult').textContent = '';
+            document.getElementById('languageResult').textContent = '';
+            document.getElementById('penmanshipResult').textContent = '';
+            
+            // 주사위 버튼 활성화
+            document.getElementById('emotionRollBtn').disabled = false;
+            document.getElementById('languageRollBtn').disabled = false;
+            document.getElementById('penmanshipRollBtn').disabled = false;
+            
+            // 능력치별 주사위 개수 설정
+            updateDiceCount();
+            
+            // 기술 라벨 업데이트
+            const skillLabels = {
+                inspiration: '영감',
+                elegance: '화려함',
+                passion: '부푼 감정'
+            };
+            document.getElementById('skillLabel').textContent = gameState.skillUsed ? '사용됨' : skillLabels[gameState.character.skill];
+            document.getElementById('skillCheck').disabled = gameState.skillUsed;
+            document.getElementById('skillCheck').checked = false;
+            
+            // 단어 은행 로드
+            loadWordBank(letterNum);
+            
+            // 점수 표시 초기화
+            updateScoreDisplay(0, 0, 0, 0);
+            
+            // 버튼 상태 초기화
+            document.getElementById('calculateScoreBtn').disabled = false;
+            document.getElementById('nextStepBtn').disabled = true;
+        }
+
+        function updateDiceCount() {
+            const abilities = gameState.character.abilities;
+            document.getElementById('emotionDiceCount').textContent = abilities.emotion;
+            document.getElementById('languageDiceCount').textContent = abilities.language;
+            document.getElementById('penmanshipDiceCount').textContent = abilities.penmanship;
+        }
+
+        // 주사위 굴리기 함수들
+        function rollEmotion() {
+            let diceCount = gameState.character.abilities.emotion;
+            
+            // 기술 보너스 체크
+            if (document.getElementById('skillCheck').checked && gameState.character.skill === 'passion') {
+                diceCount += 1;
+            }
+            
+            const result = rollDice(diceCount);
+            gameState.currentRolls.emotion = result.success;
+            
+            document.getElementById('emotionResult').innerHTML = 
+                `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
+                `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
+                `${result.success ? '성공! (5+ 나옴)' : '실패 (모두 4 이하)'}</span>`;
+            
+            document.getElementById('emotionRollBtn').disabled = true;
+        }
+
+        function rollLanguage() {
+            let diceCount = gameState.character.abilities.language;
+            
+            // 기술 보너스 체크
+            if (document.getElementById('skillCheck').checked && gameState.character.skill === 'inspiration') {
+                diceCount += 1;
+            }
+            
+            const result = rollDice(diceCount);
+            gameState.currentRolls.language = result.success;
+            
+            document.getElementById('languageResult').innerHTML = 
+                `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
+                `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
+                `${result.success ? '성공! (5+ 나옴)' : '실패 (모두 4 이하)'}</span>`;
+            
+            document.getElementById('languageRollBtn').disabled = true;
+        }
+
+        function rollPenmanship() {
+            let diceCount = gameState.character.abilities.penmanship;
+            
+            // 기술 보너스 체크
+            if (document.getElementById('skillCheck').checked && gameState.character.skill === 'elegance') {
+                diceCount += 1;
+            }
+            
+            const result = rollDice(diceCount);
+            gameState.currentRolls.penmanship = result.success;
+            
+            document.getElementById('penmanshipResult').innerHTML = 
+                `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
+                `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
+                `${result.success ? '성공! (5+ 나옴)' : '실패 (모두 4 이하)'}</span>`;
+            
+            document.getElementById('penmanshipRollBtn').disabled = true;
+        }
+
+        function rollDice(count) {
+            const rolls = [];
+            let hasSuccess = false;
+            
+            for (let i = 0; i < count; i++) {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                rolls.push(roll);
+                if (roll >= 5) {
+                    hasSuccess = true;
+                }
+            }
+            
+            return {
+                rolls: rolls,
+                success: hasSuccess
+            };
+        }
+
+        function loadWordBank(letterNum) {
+            const wordBankEl = document.getElementById('wordBank');
+            wordBankEl.innerHTML = '';
+            
+            wordBanks[letterNum].forEach(pair => {
+                const pairEl = document.createElement('div');
+                pairEl.className = 'word-pair';
+                pairEl.innerHTML = `
+                    <span class="passive-word">${pair.passive}</span><br>
+                    <span class="active-word">${pair.active}</span>
+                `;
+                wordBankEl.appendChild(pairEl);
+            });
+        }
+
+        function calculateScore() {
+            // 모든 필수 판정이 완료되었는지 확인
+            if (gameState.currentRolls.language === null || gameState.currentRolls.penmanship === null) {
+                alert('문장력 판정과 필체 판정을 먼저 완료해주세요!');
+                return;
+            }
+            
+            const letterText = document.getElementById('letterEditor').value;
+            
+            // 퀼의 정확한 점수 계산 방식
+            let letterScore = 0;
+            
+            // 1. 감정 + 문장력 조합 점수
+            if (gameState.currentRolls.emotion !== null) {
+                // 감정 판정을 했을 경우
+                if (gameState.currentRolls.emotion && gameState.currentRolls.language) {
+                    // 감정 성공 + 문장력 성공 = 2점 (고상한 단어 + 미사여구)
+                    letterScore += 2;
+                } else if (gameState.currentRolls.emotion && !gameState.currentRolls.language) {
+                    // 감정 성공 + 문장력 실패 = -1점 (천박한 단어 + 미사여구)
+                    letterScore -= 1;
+                } else if (!gameState.currentRolls.emotion && gameState.currentRolls.language) {
+                    // 감정 실패 + 문장력 성공 = 1점 (고상한 단어만)
+                    letterScore += 1;
+                }
+                // 감정 실패 + 문장력 실패 = 0점
+            } else {
+                // 감정 판정을 하지 않았을 경우
+                if (gameState.currentRolls.language) {
+                    // 문장력 성공 = 1점 (고상한 단어만)
+                    letterScore += 1;
+                }
+                // 문장력 실패 = 0점
+            }
+            
+            // 2. 필체 점수
+            if (gameState.currentRolls.penmanship) {
+                letterScore += 1;
+            }
+            
+            // 3. 기술 사용 체크
+            if (document.getElementById('skillCheck').checked && !gameState.skillUsed) {
+                gameState.skillUsed = true;
+                document.getElementById('skillLabel').textContent = '사용됨';
+                document.getElementById('skillCheck').disabled = true;
+            }
+            
+            // 점수 저장
+            gameState.letterScores.push(letterScore);
+            gameState.totalScore += letterScore;
+            
+            // 점수 표시 업데이트
+            const wordEmotionScore = letterScore - (gameState.currentRolls.penmanship ? 1 : 0);
+            const penmanshipScore = gameState.currentRolls.penmanship ? 1 : 0;
+            
+            updateScoreDisplay(
+                wordEmotionScore, 
+                0, // 사용하지 않는 매개변수
+                penmanshipScore, 
+                letterScore
+            );
+            
+            // 사용된 단어 표시
+            showUsedWords(letterText, gameState.currentLetter);
+            
+            // 버튼 상태 변경
+            document.getElementById('calculateScoreBtn').disabled = true;
+            document.getElementById('nextStepBtn').disabled = false;
+        }
+
+        function showUsedWords(text, letterNum) {
+            // 사용된 고상한 단어들 하이라이트
+            wordBanks[letterNum].forEach(pair => {
+                if (text.includes(pair.active)) {
+                    // 단어 은행에서 해당 단어를 하이라이트
+                    const wordPairs = document.querySelectorAll('.word-pair');
+                    wordPairs.forEach(element => {
+                        if (element.textContent.includes(pair.active)) {
+                            element.style.background = 'rgba(76, 175, 80, 0.3)';
+                            element.style.borderColor = '#4CAF50';
+                        }
+                    });
+                }
+            });
+        }
+
+        function countActiveWords(text, letterNum) {
+            let count = 0;
+            wordBanks[letterNum].forEach(pair => {
+                if (text.includes(pair.active)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+
+        function updateScoreDisplay(wordEmotion, unused, penmanship, letter) {
+            document.getElementById('wordEmotionScore').textContent = wordEmotion;
+            document.getElementById('penmanshipScore').textContent = penmanship;
+            document.getElementById('letterScore').textContent = letter;
+            document.getElementById('totalScore').textContent = gameState.totalScore;
+        }
+
+        function nextStep() {
+            if (gameState.currentLetter < 4) {
+                // 스토리 표시
+                showStory(gameState.currentLetter);
+            } else if (gameState.currentLetter === 4) {
+                // 마지막 편지
+                loadLetter(5);
+            } else {
+                // 게임 종료
+                showEnding();
+            }
+        }
+
+        function showStory(storyNum) {
+            document.getElementById('letterInterface').style.display = 'none';
+            document.getElementById('storySection').style.display = 'block';
+            
+            const stories = {
+                1: {
+                    title: "첫 번째 만남",
+                    content: "당신이 편지를 보낸 며칠 후, 시장에서 우연히 한 분을 만났습니다. 그분은 당신의 작품에 대해 놀라운 지식을 가지고 있었고, 예술에 대한 깊은 이해를 보여주었습니다. 당신은 그분과의 대화에서 묘한 친밀감을 느꼈습니다..."
+                },
+                2: {
+                    title: "두 번째 만남", 
+                    content: "며칠 후, 당신은 다시 그분을 만났습니다. 이번에는 더 오랜 시간 함께 보냈고, 그분의 따뜻한 마음과 지혜로운 말씀에 깊은 감명을 받았습니다. 혹시 이분이... 하는 생각이 스쳤지만, 설마 하며 고개를 저었습니다..."
+                },
+                3: {
+                    title: "깨달음의 순간",
+                    content: "당신의 마음은 이미 그분에게 향하고 있었습니다. 밤마다 그분을 떠올리며 잠들었고, 아침마다 그분을 만날 생각에 가슴이 뛰었습니다. 이것이 사랑이라는 것을 깨달았을 때, 당신은 이 마음을 누군가에게 털어놓고 싶었습니다..."
+                },
+                4: {
+                    title: "진실의 순간",
+                    content: "당신의 편지를 받은 후원자는 깊은 고민에 빠졌습니다. 자신이 사랑하는 예술가가 다른 누군가를(실제로는 자신을) 사랑한다고 고백한 것입니다. 이제 자신의 정체를 밝힐 때가 온 것 같았습니다..."
+                }
+            };
+            
+            document.getElementById('storyTitle').textContent = stories[storyNum].title;
+            document.getElementById('storyContent').textContent = stories[storyNum].content;
+        }
+
+        function continueToNextLetter() {
+            document.getElementById('storySection').style.display = 'none';
+            document.getElementById('letterInterface').style.display = 'grid';
+            loadLetter(gameState.currentLetter + 1);
+        }
+
+        function showEnding() {
+            const finalScore = gameState.totalScore;
+            let ending = '';
+            
+            if (finalScore >= 15) {
+                ending = '완벽한 사랑: 서로의 마음과 정체를 확인하고 사랑하게 됨';
+            } else if (finalScore >= 10) {
+                ending = '비터스위트: 서로의 마음과 정체는 확인하지만 신분 차이를 극복할 용기를 내지 못함';
+            } else {
+                ending = '미완의 사랑: 서로의 정체와 마음을 확인하지 못하고 후원자와 피후원자의 관계로 남게됨';
+            }
+            
+            alert(`게임 종료!\n\n${gameState.character.name}의 이야기\n총점: ${finalScore}점\n\n결말: ${ending}`);
+        }
+    </script>
+</body>
+</html>
