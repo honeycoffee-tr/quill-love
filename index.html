@@ -10,16 +10,18 @@
     <div class="container">
         <div class="game-header">
             <h1 class="game-title">다섯 번의 편지와 하나의 답장</h1>
-            <p class="game-subtitle">익명의 후원자에게 보내는 편지</p>
+            <p class="game-subtitle">익명의 후원자에게 보내는 사랑의 편지</p>
+            <p class="game-description">퀼 시나리오 - 혼자서 즐기는 편지 쓰기 롤플레잉 게임</p>
         </div>
 
         <!-- 시나리오 소개 -->
         <div class="character-creation" id="scenarioIntro">
             <h2 class="section-title">시나리오 소개</h2>
-            <div class="intro-content">
-                <p>긴 무명 생활에 지쳐가던 어느 날, 이름도 얼굴도 모르는 익명의 후원자로부터 후원금을 받게 된다.</p>
-                <p>그는 한마디 말도 없이 자신의 사용인을 통해 후원금을 전달할 뿐, 그 어떤 신상 정보도 알려주지 않는다.</p>
-                <p>어느 날, 주인공은 문득 그에게 하고 싶은 말이 떠올라 펜을 들어 편지를 쓰기 시작한다.</p>
+            <div class="scenario-intro">
+                <p style="margin-bottom: 20px;">긴 무명 생활에 지쳐가던 어느 날, 이름도 얼굴도 모르는 익명의 후원자로부터 후원금을 받게 된다.</p>
+                <p style="margin-bottom: 20px;">그는 한마디 말도 없이 자신의 사용인을 통해 후원금을 전달할 뿐, 그 어떤 신상 정보도 알려주지 않는다.</p>
+                <p style="margin-bottom: 20px;">어느 날, 주인공은 문득 그에게 하고 싶은 말이 떠올라 펜을 들어 편지를 쓰기 시작한다.</p>
+                <p><strong>목표:</strong> 다섯 통의 편지를 통해 감정을 전달하고, 마지막에 후원자로부터 답장을 받아보세요.</p>
             </div>
             <div class="action-buttons">
                 <button class="btn" onclick="showCharacterCreation()">캐릭터 만들기</button>
@@ -31,17 +33,17 @@
             <h2 class="section-title">캐릭터 메이킹</h2>
             <div class="character-form">
                 <div class="form-group">
-                    <label class="form-label">이름</label>
-                    <input type="text" class="form-input" id="characterName" placeholder="예술가의 이름을 입력하세요">
+                    <label class="form-label">예술가의 이름</label>
+                    <input type="text" class="form-input" id="characterName" placeholder="당신의 예술가 이름을 입력하세요">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">직업</label>
+                    <label class="form-label">직업 선택</label>
                     <select class="form-select" id="characterProfession" onchange="updateAbilities()">
-                        <option value="">선택하세요</option>
-                        <option value="writer">작가</option>
-                        <option value="painter">화가</option>
-                        <option value="musician">음악가</option>
+                        <option value="">직업을 선택하세요</option>
+                        <option value="writer">작가 (감정: 나쁨, 문장력: 좋음, 필체: 보통)</option>
+                        <option value="painter">화가 (감정: 보통, 문장력: 나쁨, 필체: 좋음)</option>
+                        <option value="musician">음악가 (감정: 좋음, 문장력: 보통, 필체: 나쁨)</option>
                     </select>
                 </div>
 
@@ -61,13 +63,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">기술</label>
+                    <label class="form-label">기술 선택</label>
                     <select class="form-select" id="characterSkill">
-                        <option value="">선택하세요</option>
+                        <option value="">기술을 선택하세요</option>
                         <option value="inspiration">영감 (문장력 판정에 주사위 +1)</option>
                         <option value="elegance">화려함 (필체 판정에 주사위 +1)</option>
                         <option value="passion">부푼 감정 (감정 판정에 주사위 +1)</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">후원자에게 붙일 별명 (선택사항)</label>
+                    <input type="text" class="form-input" id="patronNickname" placeholder="예: 나의 은인, 그대, 익명의 천사">
                 </div>
             </div>
 
@@ -76,128 +83,162 @@
             </div>
         </div>
 
-        <!-- 게임 인터페이스 -->
-        <div class="game-interface" id="gameInterface">
-            <!-- 좌측 사이드바 -->
-            <div class="game-sidebar">
-                <!-- 진행 상황 -->
-                <div class="paragraph-header">
-                    <div class="paragraph-number" id="paragraphNumber">1문단</div>
-                    <div class="current-step" id="currentStep">단어 선택</div>
+        <!-- 편지 작성 인터페이스 -->
+        <div class="letter-interface" id="letterInterface">
+            <!-- 메인 편지 영역 -->
+            <div class="letter-main">
+                <div class="letter-header">
+                    <div class="letter-number" id="letterNumber">첫 번째 편지</div>
+                    <div class="progress-indicator" id="progressIndicator">
+                        <div class="progress-dot current"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
                 </div>
 
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                <div class="letter-prompt" id="letterPrompt">
+                    익명의 후원자에게 첫 편지를 써보세요. 당신의 예술에 대한 후원에 감사를 표하며, 앞으로의 창작 계획을 이야기해보세요.
                 </div>
 
-                <!-- 잉크병 -->
-                <div class="inkwell">
-                    <div class="inkwell-title">🖋️ 잉크병</div>
-                    <div class="word-pairs" id="inkwell">
+                <div class="letter-container" id="letterContainer">
+                    <div class="letter-greeting">친애하는 후원자님께,</div>
+                    
+                    <div class="letter-paragraph current" id="paragraph1">
+                        <div class="paragraph-content">
+                            <div class="paragraph-label">1문단</div>
+                            <textarea class="paragraph-editor" placeholder="첫 번째 문단을 작성하세요. 선택한 단어를 반드시 포함해야 합니다."></textarea>
+                        </div>
+                        <div class="judgment-panel" id="judgment1">
+                            <div class="judgment-title">판정</div>
+                            <div class="judgment-item">
+                                <input type="checkbox" class="judgment-checkbox" id="p1-emotion">
+                                <label class="judgment-label">미사여구</label>
+                            </div>
+                            <div class="judgment-item">
+                                <input type="checkbox" class="judgment-checkbox" id="p1-language">
+                                <label class="judgment-label">문장력</label>
+                            </div>
+                            <div class="judgment-item">
+                                <input type="checkbox" class="judgment-checkbox" id="p1-penmanship">
+                                <label class="judgment-label">필체</label>
+                            </div>
+                            <div class="judgment-item skill-item" id="p1-skill">
+                                <input type="checkbox" class="judgment-checkbox" id="p1-skill-use">
+                                <label class="judgment-label">기술</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="letter-paragraph" id="paragraph2">
+                        <div class="paragraph-content">
+                            <div class="paragraph-label">2문단</div>
+                            <div class="paragraph-text">아직 작성되지 않은 문단입니다.</div>
+                        </div>
+                    </div>
+
+                    <div class="letter-paragraph" id="paragraph3">
+                        <div class="paragraph-content">
+                            <div class="paragraph-label">3문단</div>
+                            <div class="paragraph-text">아직 작성되지 않은 문단입니다.</div>
+                        </div>
+                    </div>
+
+                    <div class="letter-paragraph" id="paragraph4">
+                        <div class="paragraph-content">
+                            <div class="paragraph-label">4문단</div>
+                            <div class="paragraph-text">아직 작성되지 않은 문단입니다.</div>
+                        </div>
+                    </div>
+
+                    <div class="letter-paragraph" id="paragraph5">
+                        <div class="paragraph-content">
+                            <div class="paragraph-label">5문단</div>
+                            <div class="paragraph-text">아직 작성되지 않은 문단입니다.</div>
+                        </div>
+                    </div>
+
+                    <div class="letter-signature">
+                        <div style="margin-bottom: 10px;">진심을 담아,</div>
+                        <div><strong id="signatureName">예술가</strong></div>
+                    </div>
+                </div>
+
+                <!-- 편지 외부 판정 영역 -->
+                <div class="external-judgments" id="externalJudgments" style="display: none;">
+                    <!-- 완성된 문단들의 판정 결과가 여기에 표시됩니다 -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" id="finishParagraphBtn" onclick="finishParagraph()" disabled>문단 완성</button>
+                    <button class="btn" id="finishLetterBtn" onclick="finishLetter()" disabled style="display: none;">편지 완성</button>
+                </div>
+            </div>
+
+            <!-- 사이드바 -->
+            <div class="letter-sidebar">
+                <!-- 현재 진행 상황 -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">📝 현재 진행</div>
+                    <div style="text-align: center;">
+                        <div id="currentStep" style="font-weight: 600; color: #333; margin-bottom: 5px;">단어 선택</div>
+                        <div id="currentParagraph" style="color: #666; font-size: 0.9em;">1문단 작성 중</div>
+                    </div>
+                </div>
+
+                <!-- 단어 은행 -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🖋️ 단어 은행</div>
+                    <div class="word-pairs" id="wordBank">
                         <!-- 단어들이 동적으로 생성됩니다 -->
                     </div>
                 </div>
 
-                <!-- 기술 사용 -->
-                <div class="judgement-section" id="skillSection">
-                    <div class="judgement-title">⚡ 기술</div>
-                    <div class="skill-content">
-                        <div class="skill-name">
-                            <span id="skillName">미선택</span>
-                        </div>
-                        <div class="skill-checkbox">
-                            <label>
-                                <input type="checkbox" id="skillCheckbox" />
-                                <span>이번 판정에 기술 사용</span>
-                            </label>
-                        </div>
-                        <div class="skill-status">
-                            <span id="skillStatus">사용 가능</span>
-                        </div>
+                <!-- 주사위 영역 -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🎲 주사위</div>
+                    <div class="dice-section">
+                        <div class="dice-info">감정 (<span id="emotionDiceCount">1</span>개)</div>
+                        <button class="dice-btn" onclick="rollDiceForAbility('emotion')">굴리기</button>
+                        <div class="dice-display" id="emotionDice"></div>
                     </div>
-                </div>
-            </div>
-
-            <!-- 우측 메인 -->
-            <div class="game-main">
-                <!-- 편지 헤더 -->
-                <div class="letter-header">
-                    <div class="letter-title">익명의 후원자님께</div>
-                    <div class="letter-progress">
-                        <span id="letterProgress">1문단 작성 중</span>
+                    <div class="dice-section">
+                        <div class="dice-info">문장력 (<span id="languageDiceCount">1</span>개)</div>
+                        <button class="dice-btn" onclick="rollDiceForAbility('language')">굴리기</button>
+                        <div class="dice-display" id="languageDice"></div>
+                    </div>
+                    <div class="dice-section">
+                        <div class="dice-info">필체 (<span id="penmanshipDiceCount">1</span>개)</div>
+                        <button class="dice-btn" onclick="rollDiceForAbility('penmanship')">굴리기</button>
+                        <div class="dice-display" id="penmanshipDice"></div>
                     </div>
                 </div>
 
-                <!-- 상단 액션 영역 -->
-                <div class="action-area">
-                    <!-- 버튼 영역 -->
-                    <div class="button-area">
-                        <button class="btn" id="selectWordBtn" onclick="proceedToEmotion()" disabled>단어 선택 완료</button>
-                        <button class="btn" id="skipEmotionBtn" onclick="proceedToLanguage()" disabled style="display: none;">미사여구 건너뛰기</button>
-                        <button class="btn" id="writeBtn" onclick="proceedToWriting()" disabled style="display: none;">글쓰기 시작</button>
-                        <button class="btn" id="nextParagraphBtn" onclick="nextParagraph()" disabled style="display: none;">다음 문단</button>
-                        <button class="btn" id="finishLetterBtn" onclick="finishLetter()" disabled style="display: none;">편지 완성</button>
+                <!-- 기술 정보 -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">⚡ 기술</div>
+                    <div style="text-align: center;">
+                        <div id="skillInfo" style="font-weight: 600; color: #333; margin-bottom: 5px;">미선택</div>
+                        <div style="font-size: 0.8em; color: #666;">편지당 한 번만 사용 가능</div>
                     </div>
+                </div>
 
-                    <!-- 판정 영역 -->
-                    <div class="judgement-area">
-                        <!-- 미사여구 판정 -->
-                        <div class="judgement-card" id="emotionJudgement" style="display: none;">
-                            <div class="card-title">🎭 미사여구 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">감정 <span id="emotionDiceCount">2</span>개 주사위</div>
-                                <button class="dice-btn" id="emotionRollBtn" onclick="rollEmotion()">감정 판정</button>
-                                <div class="dice-result" id="emotionResult"></div>
+                <!-- 점수 현황 -->
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🏆 점수 현황</div>
+                    <div class="score-display">
+                        <div class="score-row">
+                            <div class="score-item">
+                                <span class="score-label">문단 점수</span>
+                                <span class="score-value" id="paragraphScore">0</span>
                             </div>
                         </div>
-
-                        <!-- 문장력 판정 -->
-                        <div class="judgement-card" id="languageJudgement" style="display: none;">
-                            <div class="card-title">📝 문장력 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">문장력 <span id="languageDiceCount">2</span>개 주사위</div>
-                                <button class="dice-btn" id="languageRollBtn" onclick="rollLanguage()">문장력 판정</button>
-                                <div class="dice-result" id="languageResult"></div>
+                        <div class="score-row">
+                            <div class="score-item">
+                                <span class="score-label">총 점수</span>
+                                <span class="score-value" id="totalScore">0</span>
                             </div>
-                        </div>
-
-                        <!-- 필체 판정 -->
-                        <div class="judgement-card" id="penmanshipJudgement" style="display: none;">
-                            <div class="card-title">✒️ 필체 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">필체 <span id="penmanshipDiceCount">2</span>개 주사위</div>
-                                <button class="dice-btn" id="penmanshipRollBtn" onclick="rollPenmanship()">필체 판정</button>
-                                <div class="dice-result" id="penmanshipResult"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 전체 편지 뷰 -->
-                <div class="letter-container" id="letterContainer">
-                    <!-- 편지 문단들이 여기에 동적으로 생성됩니다 -->
-                </div>
-
-                <!-- 현재 문단 정보 -->
-                <div id="paragraphInfo" class="paragraph-info" style="display: none;">
-                    <div class="info-title">현재 문단 정보:</div>
-                    <div class="info-content">
-                        <div>선택된 단어: <span id="selectedWord">-</span></div>
-                        <div>미사여구: <span id="emotionStatus">판정 안함</span></div>
-                        <div>문장력: <span id="languageStatus">판정 안함</span></div>
-                        <div>단어 종류: <span id="wordType">-</span></div>
-                    </div>
-                </div>
-
-                <div class="score-display">
-                    <div class="score-row">
-                        <div class="score-item">
-                            <span class="score-label">문단 점수</span>
-                            <span class="score-value" id="paragraphScore">0</span>
-                        </div>
-                        <div class="score-item">
-                            <span class="score-label">총 점수</span>
-                            <span class="score-value" id="totalScore">0</span>
                         </div>
                     </div>
                 </div>
