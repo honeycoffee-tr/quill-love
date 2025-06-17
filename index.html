@@ -94,66 +94,44 @@
                     <div class="progress-fill" id="progressFill" style="width: 20%;"></div>
                 </div>
 
-                <!-- 상단 액션 영역 -->
+                <!-- 단어 선택 버튼 -->
                 <div class="action-area">
                     <div class="button-area">
-                        <button class="btn" id="selectWordBtn" onclick="proceedToEmotion()" disabled>단어 선택 완료</button>
-                        <button class="btn" id="skipEmotionBtn" onclick="proceedToLanguage()" style="display: none;">감정 판정 건너뛰기</button>
-                        <button class="btn" id="writeBtn" onclick="proceedToWriting()" style="display: none;">글쓰기 시작</button>
-                        <button class="btn" id="nextParagraphBtn" onclick="nextParagraph()" style="display: none;">다음 문단</button>
-                        <button class="btn" id="finishLetterBtn" onclick="finishLetter()" style="display: none;">편지 완성</button>
-                    </div>
-
-                    <div class="judgement-area">
-                        <!-- 감정 판정 -->
-                        <div class="judgement-card" id="emotionJudgement" style="display: none;">
-                            <div class="card-title">🎲 감정 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">
-                                    <span id="emotionDiceCount">2</span>개 주사위
-                                </div>
-                                <button class="dice-btn" id="emotionRollBtn" onclick="rollEmotion()">굴리기</button>
-                                <div class="dice-result" id="emotionResult"></div>
-                            </div>
-                        </div>
-
-                        <!-- 문장력 판정 -->
-                        <div class="judgement-card" id="languageJudgement" style="display: none;">
-                            <div class="card-title">🎲 문장력 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">
-                                    <span id="languageDiceCount">2</span>개 주사위
-                                </div>
-                                <button class="dice-btn" id="languageRollBtn" onclick="rollLanguage()">굴리기</button>
-                                <div class="dice-result" id="languageResult"></div>
-                            </div>
-                        </div>
-
-                        <!-- 필체 판정 -->
-                        <div class="judgement-card" id="penmanshipJudgement" style="display: none;">
-                            <div class="card-title">🎲 필체 판정</div>
-                            <div class="card-content">
-                                <div class="dice-info">
-                                    <span id="penmanshipDiceCount">2</span>개 주사위
-                                </div>
-                                <button class="dice-btn" id="penmanshipRollBtn" onclick="rollPenmanship()">굴리기</button>
-                                <div class="dice-result" id="penmanshipResult"></div>
-                            </div>
-                        </div>
+                        <button class="btn" id="selectWordBtn" onclick="selectWordComplete()" disabled>단어 선택 완료</button>
                     </div>
                 </div>
 
-                <!-- 기술 사용 -->
-                <div class="judgement-section">
-                    <div class="judgement-title">⚡ 기술 사용</div>
-                    <div class="skill-content">
-                        <div class="skill-name" id="skillName">미선택</div>
-                        <div class="skill-checkbox">
+                <!-- 판정 체크박스 -->
+                <div class="judgement-checkboxes" id="judgementCheckboxes" style="display: none;">
+                    <div class="judgement-title">📝 판정 결과</div>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
                             <label>
-                                <input type="checkbox" id="skillCheckbox">
+                                <input type="checkbox" id="emotionCheck">
+                                <span>미사여구</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label>
+                                <input type="checkbox" id="languageCheck">
+                                <span>문장력</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label>
+                                <input type="checkbox" id="penmanshipCheck">
+                                <span>필체</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-item">
+                            <label>
+                                <input type="checkbox" id="skillUseCheck" disabled>
                                 <span>기술 사용</span>
                             </label>
                         </div>
+                    </div>
+                    <div class="skill-info" id="skillInfo">
+                        <div class="skill-name" id="skillName">미선택</div>
                         <div class="skill-status" id="skillStatus">사용 가능</div>
                     </div>
                 </div>
