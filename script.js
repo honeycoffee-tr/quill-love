@@ -179,12 +179,6 @@ function updateUI() {
     const progress = gameState.currentParagraph > 5 ? 100 : (gameState.currentParagraph - 1) * 20 + 20;
     document.getElementById('progressFill').style.width = progress + '%';
     
-    // 능력치 표시
-    const abilities = gameState.character.abilities;
-    document.getElementById('emotionDiceCount').textContent = abilities.emotion;
-    document.getElementById('languageDiceCount').textContent = abilities.language;
-    document.getElementById('penmanshipDiceCount').textContent = abilities.penmanship;
-    
     // 기술 정보
     const skillNames = {
         inspiration: '영감',
@@ -252,7 +246,7 @@ function updateLetterContainer() {
             const editor = document.createElement('textarea');
             editor.className = 'current-editor';
             editor.id = 'currentParagraphEditor';
-            editor.placeholder = `${i}번째 문단을 작성하세요. 선택한 단어를 포함해야 합니다.`;
+            editor.placeholder = `${i}번째 문단을 작성하세요. 단어를 선택하고 판정 후 해당 단어를 포함해서 글을 써보세요.`;
             editor.value = ''; // 에디터 초기화
             
             // 자동 높이 조절
@@ -317,34 +311,23 @@ function resetParagraphState() {
         score: 0
     };
     
-    // 판정 섹션 숨기기
-    document.getElementById('emotionJudgement').style.display = 'none';
-    document.getElementById('languageJudgement').style.display = 'none';
-    document.getElementById('penmanshipJudgement').style.display = 'none';
+    // 판정 체크박스 숨기기
+    document.getElementById('judgementCheckboxes').style.display = 'none';
     document.getElementById('paragraphInfo').style.display = 'none';
     
     // 버튼 상태 리셋
     document.getElementById('selectWordBtn').disabled = true;
-    document.getElementById('selectWordBtn').style.display = 'inline-block'; // 다시 보이게
-    document.getElementById('skipEmotionBtn').style.display = 'none';
-    document.getElementById('writeBtn').style.display = 'none';
-    document.getElementById('nextParagraphBtn').style.display = 'none';
-    document.getElementById('finishLetterBtn').style.display = 'none';
+    document.getElementById('selectWordBtn').style.display = 'inline-block';
     
-    // 주사위 버튼 리셋
-    document.getElementById('emotionRollBtn').disabled = false;
-    document.getElementById('languageRollBtn').disabled = false;
-    document.getElementById('penmanshipRollBtn').disabled = false;
-    
-    // 결과 초기화
-    document.getElementById('emotionResult').textContent = '';
-    document.getElementById('languageResult').textContent = '';
-    document.getElementById('penmanshipResult').textContent = '';
+    // 체크박스 초기화
+    document.getElementById('emotionCheck').checked = false;
+    document.getElementById('languageCheck').checked = false;
+    document.getElementById('penmanshipCheck').checked = false;
     
     // 기술 체크박스 리셋 (기술이 이미 사용되지 않았을 때만)
     if (!gameState.skillUsed) {
-        document.getElementById('skillCheckbox').checked = false;
-        document.getElementById('skillCheckbox').disabled = false;
+        document.getElementById('skillUseCheck').checked = false;
+        document.getElementById('skillUseCheck').disabled = true;
     }
 }
 
@@ -394,44 +377,77 @@ function selectWord(index, pair) {
     console.log('선택된 단어:', pair); // 디버깅용
 }
 
-// 미사여구 단계로 진행
-function proceedToEmotion() {
-    document.getElementById('currentStep').textContent = '미사여구 판정';
-    document.getElementById('emotionJudgement').style.display = 'block';
+// 단어 선택 완료
+function selectWordComplete() {
+    document.getElementById('currentStep').textContent = '판정 체크';
+    document.getElementById('judgementCheckboxes').style.display = 'block';
     document.getElementById('selectWordBtn').style.display = 'none';
-    document.getElementById('skipEmotionBtn').style.display = 'inline-block';
-    document.getElementById('skipEmotionBtn').disabled = false;
+    
+    // 기술 사용 가능 여부 확인
+    const skillUseCheck = document.getElementById('skillUseCheck');
+    if (!gameState.skillUsed) {
+        skillUseCheck.disabled = false;
+    }
     
     updateParagraphInfo();
+    
+    // 체크박스 변경 이벤트 리스너 추가
+    document.getElementById('emotionCheck').addEventListener('change', updateScore);
+    document.getElementById('languageCheck').addEventListener('change', updateScore);
+    document.getElementById('penmanshipCheck').addEventListener('change', updateScore);
+    document.getElementById('skillUseCheck').addEventListener('change', updateScore);
 }
 
-// 문장력 단계로 진행
-function proceedToLanguage() {
-    document.getElementById('currentStep').textContent = '문장력 판정';
-    document.getElementById('languageJudgement').style.display = 'block';
-    document.getElementById('skipEmotionBtn').style.display = 'none';
-    document.getElementById('emotionJudgement').style.display = 'none';
-}
-
-// 글쓰기 단계로 진행
-function proceedToWriting() {
-    document.getElementById('currentStep').textContent = '문단 작성';
-    document.getElementById('languageJudgement').style.display = 'none';
-    document.getElementById('penmanshipJudgement').style.display = 'block';
-    document.getElementById('writeBtn').style.display = 'none';
+// 점수 업데이트
+function updateScore() {
+    const emotionSuccess = document.getElementById('emotionCheck').checked;
+    const languageSuccess = document.getElementById('languageCheck').checked;
+    const penmanshipSuccess = document.getElementById('penmanshipCheck').checked;
+    const skillUsed = document.getElementById('skillUseCheck').checked;
     
-    // 사용할 단어 결정
-    const pair = gameState.paragraphData.selectedPair;
-    const useActiveWord = gameState.paragraphData.languageRoll;
-    const wordToUse = useActiveWord ? pair.active : pair.passive;
-    
-    // 현재 편집기의 placeholder 업데이트
-    const editor = document.getElementById('currentParagraphEditor');
-    if (editor) {
-        editor.placeholder = `이 문단에서 "${wordToUse}" 단어를 사용하여 글을 써보세요...`;
-        editor.focus();
+    // 기술 사용 상태 업데이트
+    if (skillUsed && !gameState.skillUsed) {
+        gameState.skillUsed = true;
+        document.getElementById('skillStatus').textContent = '사용됨';
+        document.getElementById('skillUseCheck').disabled = true;
     }
-        
+    
+    // 점수 계산 (퀼 룰에 따라)
+    let score = 0;
+    
+    // 감정 + 문장력 조합 점수
+    if (emotionSuccess && languageSuccess) {
+        // 감정 성공 + 문장력 성공 = 2점 (고상한 단어 + 미사여구)
+        score += 2;
+    } else if (emotionSuccess && !languageSuccess) {
+        // 감정 성공 + 문장력 실패 = -1점 (천박한 단어 + 미사여구)
+        score -= 1;
+    } else if (!emotionSuccess && languageSuccess) {
+        // 감정 실패 + 문장력 성공 = 1점 (고상한 단어만)
+        score += 1;
+    }
+    // 둘 다 실패 = 0점
+    
+    // 필체 점수
+    if (penmanshipSuccess) {
+        score += 1;
+    }
+    
+    // 문단 데이터 업데이트
+    gameState.paragraphData.emotionRoll = emotionSuccess;
+    gameState.paragraphData.languageRoll = languageSuccess;
+    gameState.paragraphData.penmanshipRoll = penmanshipSuccess;
+    gameState.paragraphData.score = score;
+    
+    // 화면 점수 업데이트
+    document.getElementById('paragraphScore').textContent = score;
+    
+    // 마침표 버튼 활성화 (모든 체크가 완료되었을 때)
+    const completeBtn = document.querySelector('.paragraph-complete-btn');
+    if (completeBtn) {
+        completeBtn.disabled = false;
+    }
+    
     updateParagraphInfo();
 }
 
@@ -444,161 +460,17 @@ function updateParagraphInfo() {
     document.getElementById('selectedWord').textContent = 
         `${pair.passive} / ${pair.active}`;
     
+    const emotionSuccess = document.getElementById('emotionCheck') ? document.getElementById('emotionCheck').checked : false;
+    const languageSuccess = document.getElementById('languageCheck') ? document.getElementById('languageCheck').checked : false;
+    
     document.getElementById('emotionStatus').textContent = 
-        gameState.paragraphData.emotionRoll === null ? '판정 안함' :
-        gameState.paragraphData.emotionRoll ? '성공' : '실패';
+        emotionSuccess ? '성공' : '실패';
             
     document.getElementById('languageStatus').textContent = 
-        gameState.paragraphData.languageRoll === null ? '판정 안함' :
-        gameState.paragraphData.languageRoll ? '성공 (고상한 단어)' : '실패 (천박한 단어)';
+        languageSuccess ? '성공 (고상한 단어)' : '실패 (천박한 단어)';
             
     document.getElementById('wordType').textContent = 
-        gameState.paragraphData.languageRoll === null ? '-' :
-        gameState.paragraphData.languageRoll ? pair.active : pair.passive;
-}
-
-// 주사위 굴리기 함수들
-function rollEmotion() {
-    let diceCount = gameState.character.abilities.emotion;
-    let skillUsed = false;
-    
-    // 기술 보너스
-    if (document.getElementById('skillCheckbox').checked && !gameState.skillUsed && gameState.character.skill === 'passion') {
-        diceCount += 1;
-        skillUsed = true;
-    }
-    
-    const result = rollDice(diceCount);
-    gameState.paragraphData.emotionRoll = result.success;
-    
-    if (skillUsed) {
-        gameState.skillUsed = true;
-        document.getElementById('skillStatus').textContent = '사용됨';
-        document.getElementById('skillCheckbox').disabled = true;
-    }
-    
-    document.getElementById('emotionResult').innerHTML = 
-        `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
-        `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
-        `${result.success ? '성공! (5+ 나옴)' : '실패 (모두 4 이하)'}</span>`;
-    
-    document.getElementById('emotionRollBtn').disabled = true;
-    proceedToLanguage();
-}
-
-function rollLanguage() {
-    let diceCount = gameState.character.abilities.language;
-    let skillUsed = false;
-    
-    // 기술 보너스
-    if (document.getElementById('skillCheckbox').checked && !gameState.skillUsed && gameState.character.skill === 'inspiration') {
-        diceCount += 1;
-        skillUsed = true;
-    }
-    
-    const result = rollDice(diceCount);
-    gameState.paragraphData.languageRoll = result.success;
-    
-    if (skillUsed) {
-        gameState.skillUsed = true;
-        document.getElementById('skillStatus').textContent = '사용됨';
-        document.getElementById('skillCheckbox').disabled = true;
-    }
-    
-    const wordType = result.success ? '고상한 단어' : '천박한 단어';
-    document.getElementById('languageResult').innerHTML = 
-        `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
-        `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
-        `${result.success ? '성공!' : '실패'} (${wordType})</span>`;
-    
-    document.getElementById('languageRollBtn').disabled = true;
-    document.getElementById('writeBtn').style.display = 'inline-block';
-    document.getElementById('writeBtn').disabled = false;
-}
-
-function rollPenmanship() {
-    let diceCount = gameState.character.abilities.penmanship;
-    let skillUsed = false;
-    
-    // 기술 보너스
-    if (document.getElementById('skillCheckbox').checked && !gameState.skillUsed && gameState.character.skill === 'elegance') {
-        diceCount += 1;
-        skillUsed = true;
-    }
-    
-    const result = rollDice(diceCount);
-    gameState.paragraphData.penmanshipRoll = result.success;
-    
-    if (skillUsed) {
-        gameState.skillUsed = true;
-        document.getElementById('skillStatus').textContent = '사용됨';
-        document.getElementById('skillCheckbox').disabled = true;
-    }
-    
-    document.getElementById('penmanshipResult').innerHTML = 
-        `주사위 ${diceCount}개: ${result.rolls.join(', ')}<br>` +
-        `<span class="${result.success ? 'dice-success' : 'dice-failure'}">` +
-        `${result.success ? '성공! (+1점)' : '실패'}</span>`;
-    
-    document.getElementById('penmanshipRollBtn').disabled = true;
-    
-    // 점수 계산
-    calculateParagraphScore();
-    
-    // 마침표 버튼 활성화
-    const completeBtn = document.querySelector('.paragraph-complete-btn');
-    if (completeBtn) {
-        completeBtn.disabled = false;
-    }
-}
-
-function rollDice(count) {
-    const rolls = [];
-    let hasSuccess = false;
-    
-    for (let i = 0; i < count; i++) {
-        const roll = Math.floor(Math.random() * 6) + 1;
-        rolls.push(roll);
-        if (roll >= 5) {
-            hasSuccess = true;
-        }
-    }
-    
-    return {
-        rolls: rolls,
-        success: hasSuccess
-    };
-}
-
-// 문단 점수 계산
-function calculateParagraphScore() {
-    let score = 0;
-    
-    // 단어 점수
-    if (gameState.paragraphData.languageRoll) {
-        score += 1; // 고상한 단어
-        
-        // 미사여구 보너스
-        if (gameState.paragraphData.emotionRoll) {
-            score += 1; // 미사여구로 총 2점
-        }
-    } else {
-        // 천박한 단어
-        if (gameState.paragraphData.emotionRoll) {
-            score -= 1; // 미사여구 패널티
-        }
-    }
-    
-    // 필체 점수
-    if (gameState.paragraphData.penmanshipRoll) {
-        score += 1;
-    }
-    
-    gameState.paragraphData.score = score;
-    gameState.totalScore += score;
-    
-    document.getElementById('paragraphScore').textContent = score;
-    document.getElementById('totalScore').textContent = gameState.totalScore;
+        languageSuccess ? pair.active : pair.passive;
 }
 
 // 다음 문단으로
@@ -606,6 +478,10 @@ function nextParagraph() {
     // 현재 문단 텍스트 저장
     const editor = document.getElementById('currentParagraphEditor');
     gameState.paragraphData.paragraphText = editor ? editor.value : '';
+    
+    // 총점에 현재 문단 점수 추가
+    gameState.totalScore += gameState.paragraphData.score;
+    document.getElementById('totalScore').textContent = gameState.totalScore;
     
     // 현재 문단 저장
     gameState.completedParagraphs.push({...gameState.paragraphData});
@@ -622,6 +498,10 @@ function finishLetter() {
     // 마지막 문단 텍스트 저장
     const editor = document.getElementById('currentParagraphEditor');
     gameState.paragraphData.paragraphText = editor ? editor.value : '';
+    
+    // 총점에 현재 문단 점수 추가
+    gameState.totalScore += gameState.paragraphData.score;
+    document.getElementById('totalScore').textContent = gameState.totalScore;
     
     // 마지막 문단 저장
     gameState.completedParagraphs.push({...gameState.paragraphData});
